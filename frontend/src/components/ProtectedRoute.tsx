@@ -19,7 +19,13 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{ openLogin: true, from: location.pathname }}
+      />
+    );
   }
 
   return <>{children}</>;

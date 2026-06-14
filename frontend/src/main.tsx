@@ -5,8 +5,6 @@ import App from './App';
 import { AuthProvider } from './hooks/useAuth';
 import './styles/global.css';
 
-document.documentElement.classList.add('dark');
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
