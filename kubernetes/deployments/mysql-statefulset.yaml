@@ -1,0 +1,142 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-scripts
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/part-of: urbanflow
+    app.kubernetes.io/component: database
+data:
+  01-schemas.sql: |
+    CREATE DATABASE IF NOT EXISTS passenger_db;
+    CREATE DATABASE IF NOT EXISTS ticketing_db;
+    CREATE DATABASE IF NOT EXISTS gps_db;
+    CREATE DATABASE IF NOT EXISTS notification_db;
+    CREATE DATABASE IF NOT EXISTS analytics_db;
+
+    GRANT ALL PRIVILEGES ON passenger_db.* TO 'urbanflow'@'%';
+    GRANT ALL PRIVILEGES ON ticketing_db.* TO 'urbanflow'@'%';
+    GRANT ALL PRIVILEGES ON gps_db.* TO 'urbanflow'@'%';
+    GRANT ALL PRIVILEGES ON notification_db.* TO 'urbanflow'@'%';
+    GRANT ALL PRIVILEGES ON analytics_db.* TO 'urbanflow'@'%';
+    FLUSH PRIVILEGES;
+  02-passenger.sql: |
+    USE passenger_db;
+    CREATE TABLE IF NOT EXISTS passengers (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      password_hash VARCHAR(255) NOT NULL,
+      full_name VARCHAR(255) NOT NULL,
+      phone VARCHAR(20),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/part-of: urbanflow
+    app.kubernetes.io/component: database
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mysql
+        app.kubernetes.io/part-of: urbanflow
+        app.kubernetes.io/component: database
+    spec:
+      securityContext:
+        fsGroup: 999
+      containers:
+        - name: mysql
+          image: mysql:8.0.36
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_DATABASE
+              value: passenger_db
+          envFrom:
+            - configMapRef:
+                name: app-config
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 250m
+            limits:
+              memory: 2Gi
+              cpu: "1"
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -u root -p"${MYSQL_ROOT_PASSWORD}"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -u root -p"${MYSQL_ROOT_PASSWORD}"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: mysql-init
+          configMap:
+            name: mysql-init-scripts
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+        labels:
+          app.kubernetes.io/name: mysql
+          app.kubernetes.io/part-of: urbanflow
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi

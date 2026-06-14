@@ -1,0 +1,46 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "title": "Tickets Created Rate",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=\"ticketing-service\", route=\"/api/tickets\", method=\"POST\"}[5m]))",
+          "legendFormat": "tickets/sec"
+        }
+      ]
+    },
+    {
+      "title": "GPS Events Rate",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=\"gps-service\", method=\"POST\"}[5m]))",
+          "legendFormat": "gps events/sec"
+        }
+      ]
+    },
+    {
+      "title": "Active Users (Login Rate)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{service=\"passenger-service\", route=~\".*login.*\"}[5m]))",
+          "legendFormat": "logins/sec"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["urbanflow", "business"],
+  "time": { "from": "now-6h", "to": "now" },
+  "title": "UrbanFlow Business Metrics",
+  "uid": "urbanflow-business",
+  "version": 1
+}

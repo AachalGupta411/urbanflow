@@ -1,0 +1,332 @@
+# UrbanFlow – Local Development Stack
+# Starts all microservices, infrastructure, and observability components.
+
+x-service-env: &service-env
+  NODE_ENV: development
+  MYSQL_HOST: mysql
+  MYSQL_PORT: 3306
+  MYSQL_USER: urbanflow
+  MYSQL_PASSWORD: urbanflow_pass
+  REDIS_URL: redis://redis:6379
+  KAFKA_BROKERS: kafka:9092
+  JWT_SECRET: urbanflow-dev-secret-change-in-prod
+  LOG_LEVEL: info
+
+services:
+  # ── Infrastructure ──────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: urbanflow-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_USER: urbanflow
+      MYSQL_PASSWORD: urbanflow_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uurbanflow", "-purbanflow_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - urbanflow
+
+  redis:
+    image: redis:7-alpine
+    container_name: urbanflow-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - urbanflow
+
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: urbanflow-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    networks:
+      - urbanflow
+
+  # ── Microservices ─────────────────────────────────────────────────
+  passenger-service:
+    build:
+      context: ./services
+      dockerfile: passenger-service/Dockerfile
+    container_name: urbanflow-passenger
+    environment:
+      <<: *service-env
+      SERVICE_NAME: passenger-service
+      PORT: 3002
+      MYSQL_DATABASE: passenger_db
+    ports:
+      - "3002:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - urbanflow
+
+  ticketing-service:
+    build:
+      context: ./services
+      dockerfile: ticketing-service/Dockerfile
+    container_name: urbanflow-ticketing
+    environment:
+      <<: *service-env
+      SERVICE_NAME: ticketing-service
+      PORT: 3001
+      MYSQL_DATABASE: ticketing_db
+    ports:
+      - "3001:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      passenger-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - urbanflow
+
+  gps-service:
+    build:
+      context: ./services
+      dockerfile: gps-service/Dockerfile
+    container_name: urbanflow-gps
+    environment:
+      <<: *service-env
+      SERVICE_NAME: gps-service
+      PORT: 3003
+      MYSQL_DATABASE: gps_db
+      GPS_API_KEY: urbanflow-gps-dev-key
+    ports:
+      - "3003:3003"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - urbanflow
+
+  notification-service:
+    build:
+      context: ./services
+      dockerfile: notification-service/Dockerfile
+    container_name: urbanflow-notification
+    environment:
+      <<: *service-env
+      SERVICE_NAME: notification-service
+      PORT: 3004
+      MYSQL_DATABASE: notification_db
+    ports:
+      - "3004:3004"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3004/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - urbanflow
+
+  analytics-service:
+    build:
+      context: ./services
+      dockerfile: analytics-service/Dockerfile
+    container_name: urbanflow-analytics
+    environment:
+      <<: *service-env
+      SERVICE_NAME: analytics-service
+      PORT: 3005
+      MYSQL_DATABASE: analytics_db
+    ports:
+      - "3005:3005"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3005/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - urbanflow
+
+  # ── Frontend ──────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_TICKETING_API: ""
+        VITE_PASSENGER_API: ""
+        VITE_GPS_API: ""
+        VITE_NOTIFICATION_API: ""
+        VITE_ANALYTICS_API: ""
+    container_name: urbanflow-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - passenger-service
+      - ticketing-service
+    networks:
+      - urbanflow
+
+  # ── Monitoring (optional: docker compose --profile observability up) ──
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v2.51.0
+    container_name: urbanflow-prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - urbanflow
+
+  grafana:
+    profiles: [observability]
+    image: grafana/grafana:10.4.0
+    container_name: urbanflow-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - urbanflow
+
+  # ── Logging / ELK (optional: docker compose --profile observability up) ──
+  elasticsearch:
+    profiles: [observability]
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: urbanflow-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - urbanflow
+
+  logstash:
+    profiles: [observability]
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    container_name: urbanflow-logstash
+    volumes:
+      - ./logging/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5044:5044"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - urbanflow
+
+  kibana:
+    profiles: [observability]
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: urbanflow-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - urbanflow
+
+volumes:
+  mysql_data:
+  prometheus_data:
+  grafana_data:
+  es_data:
+
+networks:
+  urbanflow:
+    driver: bridge

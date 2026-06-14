@@ -1,0 +1,15 @@
+{
+  "name": "urbanflow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UrbanFlow – Intelligent Public Transportation Platform",
+  "scripts": {
+    "test:services": "for svc in ticketing-service passenger-service gps-service notification-service analytics-service; do (cd services/$svc && npm test) || exit 1; done",
+    "build:images": "./scripts/build-all.sh",
+    "smoke": "./scripts/smoke-test.sh",
+    "setup": "./scripts/setup-local.sh"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

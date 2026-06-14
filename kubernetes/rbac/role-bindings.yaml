@@ -1,0 +1,118 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ticketing-service-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: ticketing-service
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: ticketing-service
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: microservice-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: passenger-service-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: passenger-service
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: passenger-service
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: microservice-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gps-service-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: gps-service
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: gps-service
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: microservice-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: notification-service-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: notification-service
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: microservice-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: analytics-service-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: analytics-service
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: analytics-service
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: microservice-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: frontend
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: frontend-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mysql-backup-binding
+  namespace: urbanflow
+  labels:
+    app.kubernetes.io/name: mysql-backup
+    app.kubernetes.io/part-of: urbanflow
+subjects:
+  - kind: ServiceAccount
+    name: mysql-backup
+    namespace: urbanflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mysql-backup-role

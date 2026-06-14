@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# Docker
+.docker/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+terraform/environments/*/terraform.tfvars
+
+# Kubernetes secrets (real)
+kubernetes/secrets/*-secrets.yaml
+!kubernetes/secrets/*.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Test & coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+
+# k6 results
+tests/load/k6/results/
+
+# Local dev runtime
+.dev-local.pids
+.dev-local-logs/
+
+# MySQL dumps (local)
+*.sql.gz
+backups/

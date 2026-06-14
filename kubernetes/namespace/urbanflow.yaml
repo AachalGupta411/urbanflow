@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: urbanflow
+  labels:
+    app.kubernetes.io/part-of: urbanflow
+    app.kubernetes.io/managed-by: kubectl
+    environment: production
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: urbanflow-monitoring
+  labels:
+    app.kubernetes.io/part-of: urbanflow
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/managed-by: kubectl
+    environment: production
