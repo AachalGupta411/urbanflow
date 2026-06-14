@@ -29,18 +29,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-white/10 bg-ops-navy/95 backdrop-blur-xl transition-all duration-300',
+        'fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300',
         collapsed ? 'w-[72px]' : 'w-64'
       )}
     >
-      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary shadow-glow">
+      <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
           <Train className="h-5 w-5" />
         </div>
         {!collapsed && (
           <div className="animate-fade-in overflow-hidden">
-            <p className="text-sm font-bold tracking-tight text-foreground">UrbanFlow</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Ops Center</p>
+            <p className="text-sm font-bold tracking-tight text-slate-900">UrbanFlow</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500">Ops Center</p>
           </div>
         )}
       </div>
@@ -54,8 +54,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               cn(
                 'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-primary/15 text-primary shadow-glow'
-                  : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                  ? 'bg-teal-50 text-teal-700 shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               )
             }
             title={collapsed ? label : undefined}
@@ -66,18 +66,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-slate-200 p-3">
         <div
           className={cn(
-            'glass-panel flex items-center gap-2 rounded-lg p-3',
+            'flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3',
             collapsed && 'justify-center'
           )}
         >
-          <Activity className="h-4 w-4 shrink-0 animate-pulse-soft text-emerald-400" />
+          <Activity className="h-4 w-4 shrink-0 animate-pulse-soft text-emerald-600" />
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-xs font-medium text-foreground">System Status</p>
-              <p className="text-[10px] text-emerald-400">All services operational</p>
+              <p className="text-xs font-medium text-slate-900">System Status</p>
+              <p className="text-[10px] text-emerald-600">All services operational</p>
             </div>
           )}
         </div>
@@ -85,7 +85,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <button
           type="button"
           onClick={onToggle}
-          className="mt-3 flex w-full items-center justify-center rounded-lg border border-white/10 py-2 text-muted-foreground transition hover:bg-white/5 hover:text-foreground"
+          className="mt-3 flex w-full items-center justify-center rounded-lg border border-slate-200 py-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

@@ -8,6 +8,7 @@ import {
   YAxis,
 } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AXIS_TICK, CHART_TOOLTIP, GRID_STROKE } from './chartTheme';
 
 export interface ChartDataPoint {
   label: string;
@@ -37,45 +38,38 @@ export default function AnalyticsChart({
   loading,
 }: AnalyticsChartProps) {
   return (
-    <Card className="border-white/10 bg-ops-panel/80">
+    <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="h-[220px] animate-pulse rounded-lg bg-white/5" />
+          <div className="h-[220px] animate-pulse rounded-lg bg-slate-100" />
         ) : (
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id={`grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+                  <stop offset="0%" stopColor={color} stopOpacity={0.25} />
                   <stop offset="100%" stopColor={color} stopOpacity={0} />
                 </linearGradient>
                 {secondaryKey && (
                   <linearGradient id={`grad-${secondaryKey}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={secondaryColor} stopOpacity={0.25} />
+                    <stop offset="0%" stopColor={secondaryColor} stopOpacity={0.2} />
                     <stop offset="100%" stopColor={secondaryColor} stopOpacity={0} />
                   </linearGradient>
                 )}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
               <XAxis
                 dataKey="label"
-                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
-              <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  background: 'rgba(17, 24, 39, 0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                }}
-              />
+              <YAxis tick={{ fill: AXIS_TICK, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={CHART_TOOLTIP} />
               <Area
                 type="monotone"
                 dataKey={dataKey}

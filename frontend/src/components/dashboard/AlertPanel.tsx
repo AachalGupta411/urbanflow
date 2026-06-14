@@ -20,10 +20,10 @@ export default function AlertPanel({ alerts, loading, maxItems = 6 }: AlertPanel
   const visible = alerts.slice(0, maxItems);
 
   return (
-    <Card className="h-full border-white/10 bg-ops-panel/80">
+    <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center gap-2">
-          <Bell className="h-4 w-4 text-primary" />
+          <Bell className="h-4 w-4 text-teal-600" />
           <CardTitle>Transportation Alerts</CardTitle>
         </div>
         <Badge variant="muted">{alerts.length} total</Badge>
@@ -32,14 +32,14 @@ export default function AlertPanel({ alerts, loading, maxItems = 6 }: AlertPanel
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 animate-pulse rounded-lg bg-white/5" />
+              <div key={i} className="h-16 animate-pulse rounded-lg bg-slate-100" />
             ))}
           </div>
         ) : visible.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Bell className="mb-2 h-8 w-8 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">No active alerts</p>
-            <p className="text-xs text-muted-foreground/70">All routes operating normally</p>
+            <Bell className="mb-2 h-8 w-8 text-slate-300" />
+            <p className="text-sm text-slate-500">No active alerts</p>
+            <p className="text-xs text-slate-400">All routes operating normally</p>
           </div>
         ) : (
           visible.map((alert) => {
@@ -49,23 +49,23 @@ export default function AlertPanel({ alerts, loading, maxItems = 6 }: AlertPanel
               <div
                 key={alert.id}
                 className={cn(
-                  'animate-slide-in rounded-lg border border-white/5 bg-white/[0.03] p-3 transition hover:border-white/10',
-                  !alert.read && 'border-l-2 border-l-primary'
+                  'animate-slide-in rounded-lg border border-slate-100 bg-slate-50 p-3 transition hover:border-slate-200',
+                  !alert.read && 'border-l-2 border-l-teal-500'
                 )}
               >
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 rounded-md bg-white/5 p-1.5">
-                    <Icon className="h-3.5 w-3.5 text-primary" />
+                  <div className="mt-0.5 rounded-md bg-white p-1.5 shadow-sm">
+                    <Icon className="h-3.5 w-3.5 text-teal-600" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-foreground">{alert.title}</p>
+                      <p className="truncate text-sm font-medium text-slate-900">{alert.title}</p>
                       <Badge variant={config.variant} className="shrink-0 text-[10px]">
                         {config.label}
                       </Badge>
                     </div>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{alert.message}</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground/70">
+                    <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{alert.message}</p>
+                    <p className="mt-1 text-[10px] text-slate-400">
                       {new Date(alert.created_at).toLocaleString()}
                     </p>
                   </div>

@@ -45,7 +45,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <BookingNavbar />
-      <LoginModal />
       <div className="mx-auto flex max-w-md flex-col px-4 py-12 sm:py-16">
         <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg">
           <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>

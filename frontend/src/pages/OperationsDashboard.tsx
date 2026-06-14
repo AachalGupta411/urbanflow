@@ -48,16 +48,16 @@ export default function OperationsDashboardPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
             Operations Command Center
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-slate-500">
             Real-time fleet monitoring, ticketing analytics & transit alerts
           </p>
         </div>
         <div className="flex items-center gap-3">
           {lastUpdated && (
-            <span className="hidden text-xs text-muted-foreground sm:inline">
+            <span className="hidden text-xs text-slate-500 sm:inline">
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -66,8 +66,8 @@ export default function OperationsDashboardPage() {
             onClick={() => void handleRefresh()}
             disabled={refreshing}
             className={cn(
-              'flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-foreground transition',
-              'hover:border-primary/40 hover:bg-primary/10 hover:text-primary',
+              'flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition',
+              'hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700',
               refreshing && 'opacity-60'
             )}
           >
@@ -129,10 +129,10 @@ export default function OperationsDashboardPage() {
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <div className="xl:col-span-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
               Fleet Tracking
             </h2>
-            <span className="text-xs text-emerald-400">● Live</span>
+            <span className="text-xs text-emerald-600">● Live</span>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
             {fleet.map((vehicle) => (
@@ -147,7 +147,7 @@ export default function OperationsDashboardPage() {
         </div>
 
         <div className="xl:col-span-4">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">
             Route Map
           </h2>
           <RouteMap

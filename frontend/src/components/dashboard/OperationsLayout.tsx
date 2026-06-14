@@ -11,11 +11,11 @@ export default function OperationsLayout({ alertCount = 0 }: OperationsLayoutPro
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((c) => !c)} />
       <Navbar sidebarCollapsed={sidebarCollapsed} alertCount={alertCount} />
       <main
-        className="min-h-screen pt-16 transition-all duration-300"
+        className="min-h-screen bg-slate-50 pt-16 transition-all duration-300"
         style={{ marginLeft: sidebarCollapsed ? 72 : 256 }}
       >
         <div className="p-4 md:p-6 lg:p-8">

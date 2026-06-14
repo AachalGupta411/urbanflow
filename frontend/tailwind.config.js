@@ -31,9 +31,9 @@ export default {
           foreground: 'hsl(var(--card-foreground))',
         },
         ops: {
-          navy: '#0a0f1e',
-          panel: '#111827',
-          glass: '#111827',
+          navy: '#ffffff',
+          panel: '#ffffff',
+          glass: '#ffffff',
           blue: '#3b82f6',
           cyan: '#06b6d4',
           green: '#10b981',
@@ -47,8 +47,8 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       boxShadow: {
-        glass: '0 8px 32px rgba(0, 0, 0, 0.37)',
-        glow: '0 0 24px rgba(59, 130, 246, 0.25)',
+        glass: '0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06)',
+        glow: '0 4px 20px rgba(59, 130, 246, 0.12)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

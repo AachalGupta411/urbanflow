@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 
 type TripType = 'oneway' | 'roundtrip';
 
+const HERO_IMAGE = '/images/hero-bus.png';
+
 export default function BookingHero() {
   const [tripType, setTripType] = useState<TripType>('oneway');
   const [from, setFrom] = useState('Mumbai');
@@ -54,9 +56,10 @@ export default function BookingHero() {
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl shadow-slate-300/50">
               <img
-                src="https://images.unsplash.com/photo-1570125909232-e097023bd6c8?auto=format&fit=crop&w=900&q=80"
+                src={HERO_IMAGE}
                 alt="Modern intercity bus on a scenic highway"
                 className="h-full w-full object-cover"
+                loading="eager"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
             </div>
@@ -70,9 +73,10 @@ export default function BookingHero() {
         {/* Mobile hero image */}
         <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-2xl shadow-lg lg:hidden">
           <img
-            src="https://images.unsplash.com/photo-1570125909232-e097023bd6c8?auto=format&fit=crop&w=800&q=80"
-            alt="Modern intercity bus"
+            src={HERO_IMAGE}
+            alt="Modern intercity bus on a scenic highway"
             className="h-full w-full object-cover"
+            loading="eager"
           />
         </div>
 

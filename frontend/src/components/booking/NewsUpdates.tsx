@@ -8,7 +8,8 @@ const news = [
     title: 'New Express Routes Added on Mumbai–Pune Corridor',
     excerpt:
       'Six new premium AC buses now operate hourly between Mumbai and Pune with reduced travel time.',
-    image: 'https://images.unsplash.com/photo-1544620307-cf1550695a24?auto=format&fit=crop&w=500&q=80',
+    image: '/images/news/express-routes.png',
+    alt: 'Express buses at Mumbai Pune corridor terminal',
   },
   {
     date: 'Jun 10, 2026',
@@ -16,7 +17,8 @@ const news = [
     title: 'Metro Line 3 Now Connected to UrbanFlow Ticketing',
     excerpt:
       'Passengers can book combined metro and bus tickets in a single transaction through the app.',
-    image: 'https://images.unsplash.com/photo-1519005059706-2e0222277848?auto=format&fit=crop&w=500&q=80',
+    image: '/images/news/metro-integration.png',
+    alt: 'Modern metro station integrated with bus ticketing',
   },
   {
     date: 'Jun 8, 2026',
@@ -24,7 +26,8 @@ const news = [
     title: 'Real-Time Crowd Alerts Rolled Out Across 40 Routes',
     excerpt:
       'New passenger density indicators help commuters choose less crowded buses during peak hours.',
-    image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80',
+    image: '/images/news/crowd-alerts.png',
+    alt: 'Commuters receiving real-time crowd alerts at bus stop',
   },
 ];
 
@@ -44,8 +47,9 @@ export default function NewsUpdates() {
                 <div className="aspect-[16/10] overflow-hidden">
                   <img
                     src={item.image}
-                    alt=""
+                    alt={item.alt}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-5">

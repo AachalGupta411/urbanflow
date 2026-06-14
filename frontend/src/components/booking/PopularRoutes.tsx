@@ -9,7 +9,7 @@ const routes = [
     to: 'Pune',
     price: '₹450',
     duration: '3h 30m',
-    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea4af?auto=format&fit=crop&w=600&q=80',
+    image: '/images/routes/mumbai-pune.png',
     alt: 'Mumbai to Pune express highway',
   },
   {
@@ -17,7 +17,7 @@ const routes = [
     to: 'Jaipur',
     price: '₹380',
     duration: '5h 15m',
-    image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=600&q=80',
+    image: '/images/routes/delhi-jaipur.png',
     alt: 'Delhi to Jaipur route through Rajasthan',
   },
   {
@@ -25,7 +25,7 @@ const routes = [
     to: 'Mysore',
     price: '₹320',
     duration: '2h 45m',
-    image: 'https://images.unsplash.com/photo-1582515073490-39981397c445?auto=format&fit=crop&w=600&q=80',
+    image: '/images/routes/bangalore-mysore.png',
     alt: 'Bangalore to Mysore scenic route',
   },
   {
@@ -33,7 +33,7 @@ const routes = [
     to: 'Coimbatore',
     price: '₹520',
     duration: '7h 00m',
-    image: 'https://images.unsplash.com/photo-1587474260587-136574528176?auto=format&fit=crop&w=600&q=80',
+    image: '/images/routes/chennai-coimbatore.png',
     alt: 'Chennai to Coimbatore intercity travel',
   },
 ];
@@ -60,6 +60,7 @@ export default function PopularRoutes() {
                     src={route.image}
                     alt={route.alt}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
                   <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800 backdrop-blur">

@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useEffect } from 'react';
 import { OperationsLayout } from '@/components/dashboard';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
@@ -13,11 +12,6 @@ import TicketsPage from '@/pages/Tickets';
 import LandingPage from '@/pages/Landing';
 
 function OperationsLayoutWithAlerts() {
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-    return () => document.documentElement.classList.remove('dark');
-  }, []);
-
   const { metrics } = useOperationsDashboard(60000);
   return <OperationsLayout alertCount={metrics.alertCount} />;
 }
