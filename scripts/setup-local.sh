@@ -26,6 +26,10 @@ docker compose up -d --build
 echo "Waiting for services to be healthy (up to 3 minutes)..."
 sleep 30
 
+echo "Seeding demo GPS coordinates..."
+chmod +x scripts/seed-gps.sh
+./scripts/seed-gps.sh || echo "GPS seed skipped (will retry when MySQL is ready)"
+
 MAX_RETRIES=12
 for i in $(seq 1 $MAX_RETRIES); do
   if ./scripts/smoke-test.sh 2>/dev/null; then
@@ -35,11 +39,12 @@ for i in $(seq 1 $MAX_RETRIES); do
     echo "  >>> Open the app:  http://localhost:8080  <<<"
     echo ""
     echo "  API services: 3001-3005"
+    echo "  Grafana:       http://localhost:3000  (admin/admin)"
+    echo "    Dashboards:  UrbanFlow folder (mock metrics auto-loaded)"
+    echo "  Prometheus:    http://localhost:9090"
     echo ""
-    echo "  Monitoring (optional – not started by default):"
-    echo "    docker compose --profile observability up -d"
-    echo "    Grafana:     http://localhost:3000  (admin/admin)"
-    echo "    Prometheus:  http://localhost:9090"
+    echo "  ELK logging (optional):"
+    echo "    docker compose --profile observability up -d elasticsearch logstash kibana"
     echo "    Kibana:      http://localhost:5601"
     exit 0
   fi

@@ -10,10 +10,14 @@
       "title": "HTTP Request Rate",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "sum(rate(http_requests_total[1m])) by (service)",
-          "legendFormat": "{{ service }}"
+          "legendFormat": "{{ service }}",
+          "refId": "A"
         }
       ]
     },
@@ -21,10 +25,14 @@
       "title": "API Latency (p99)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))",
-          "legendFormat": "{{ service }}"
+          "legendFormat": "{{ service }}",
+          "refId": "A"
         }
       ]
     },
@@ -32,10 +40,14 @@
       "title": "Error Rate",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)",
-          "legendFormat": "{{ service }}"
+          "legendFormat": "{{ service }}",
+          "refId": "A"
         }
       ]
     },
@@ -43,10 +55,14 @@
       "title": "Memory Usage (MB)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "process_resident_memory_bytes / 1024 / 1024",
-          "legendFormat": "{{ service }}"
+          "legendFormat": "{{ service }}",
+          "refId": "A"
         }
       ]
     }

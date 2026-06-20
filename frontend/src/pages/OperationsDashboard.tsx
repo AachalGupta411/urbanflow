@@ -16,7 +16,7 @@ import {
   RouteMap,
   TicketStats,
 } from '@/components/dashboard';
-import { useOperationsDashboard } from '@/hooks/useOperationsDashboard';
+import { useOperationsDashboardContext } from '@/contexts/OperationsDashboardContext';
 import { cn } from '@/lib/utils';
 
 export default function OperationsDashboardPage() {
@@ -32,7 +32,7 @@ export default function OperationsDashboardPage() {
     loading,
     lastUpdated,
     refresh,
-  } = useOperationsDashboard();
+  } = useOperationsDashboardContext();
 
   const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>('BUS-001');
   const [refreshing, setRefreshing] = useState(false);

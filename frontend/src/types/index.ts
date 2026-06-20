@@ -76,29 +76,11 @@ export interface Notification {
   created_at: string;
 }
 
-export interface AnalyticsPassengers {
-  total_passengers: number;
-  new_today: number;
-  active_sessions: number;
-}
-
-export interface AnalyticsTickets {
-  total_tickets: number;
-  active_tickets: number;
-  cancelled_tickets: number;
-  revenue_total: number;
-  tickets_today: number;
-}
-
 export interface RouteAnalytics {
   route_id: string;
   ticket_count: number;
   avg_fare: number;
   utilization_pct: number;
-}
-
-export interface AnalyticsRoutes {
-  routes: RouteAnalytics[];
 }
 
 export interface ApiError {

@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { OperationsLayout } from '@/components/dashboard';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
-import { useOperationsDashboard } from '@/hooks/useOperationsDashboard';
+import { OperationsDashboardProvider, useOperationsDashboardContext } from '@/contexts/OperationsDashboardContext';
 import AnalyticsPage from '@/pages/Analytics';
 import OperationsDashboardPage from '@/pages/OperationsDashboard';
 import GpsTrackingPage from '@/pages/GpsTracking';
@@ -12,8 +12,18 @@ import TicketsPage from '@/pages/Tickets';
 import LandingPage from '@/pages/Landing';
 
 function OperationsLayoutWithAlerts() {
-  const { metrics } = useOperationsDashboard(60000);
+  const { metrics } = useOperationsDashboardContext();
   return <OperationsLayout alertCount={metrics.alertCount} />;
+}
+
+function ProtectedOperationsRoutes() {
+  return (
+    <ProtectedRoute>
+      <OperationsDashboardProvider>
+        <OperationsLayoutWithAlerts />
+      </OperationsDashboardProvider>
+    </ProtectedRoute>
+  );
 }
 
 export default function App() {
@@ -30,11 +40,7 @@ export default function App() {
 
         {/* Protected operations dashboard routes */}
         <Route
-          element={
-            <ProtectedRoute>
-              <OperationsLayoutWithAlerts />
-            </ProtectedRoute>
-          }
+          element={<ProtectedOperationsRoutes />}
         >
           <Route path="dashboard" element={<OperationsDashboardPage />} />
           <Route path="tickets" element={<TicketsPage />} />

@@ -7,10 +7,14 @@
       "title": "Tickets Created Rate",
       "type": "stat",
       "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{service=\"ticketing-service\", route=\"/api/tickets\", method=\"POST\"}[5m]))",
-          "legendFormat": "tickets/sec"
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(http_requests_total{service=\"ticketing-service\", route=\"/api/tickets\", method=\"POST\"}[1m]))",
+          "legendFormat": "tickets/sec",
+          "refId": "A"
         }
       ]
     },
@@ -18,10 +22,14 @@
       "title": "GPS Events Rate",
       "type": "stat",
       "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{service=\"gps-service\", method=\"POST\"}[5m]))",
-          "legendFormat": "gps events/sec"
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(http_requests_total{service=\"gps-service\", method=\"POST\"}[1m]))",
+          "legendFormat": "gps events/sec",
+          "refId": "A"
         }
       ]
     },
@@ -29,10 +37,14 @@
       "title": "Active Users (Login Rate)",
       "type": "stat",
       "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{service=\"passenger-service\", route=~\".*login.*\"}[5m]))",
-          "legendFormat": "logins/sec"
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(http_requests_total{service=\"passenger-service\", route=~\".*login.*\"}[1m]))",
+          "legendFormat": "logins/sec",
+          "refId": "A"
         }
       ]
     }

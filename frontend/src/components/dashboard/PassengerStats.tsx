@@ -49,9 +49,13 @@ export default function PassengerStats({ data, summary, loading }: PassengerStat
 
         {loading ? (
           <div className="h-[200px] animate-pulse rounded-lg bg-slate-100" />
+        ) : data.length === 0 ? (
+          <div className="flex h-[220px] items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
+            Passenger trends will appear as users register and log in.
+          </div>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
               <XAxis dataKey="label" tick={{ fill: AXIS_TICK, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: AXIS_TICK, fontSize: 11 }} axisLine={false} tickLine={false} />

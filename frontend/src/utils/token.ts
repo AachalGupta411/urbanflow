@@ -63,9 +63,40 @@ export function formatDateTime(value: string): string {
 
 export function getErrorMessage(error: unknown, fallback = 'Something went wrong'): string {
   if (typeof error === 'object' && error !== null && 'response' in error) {
-    const response = (error as { response?: { data?: { error?: string; message?: string } } }).response;
-    return response?.data?.error || response?.data?.message || fallback;
+    const axiosError = error as {
+      response?: {
+        status?: number;
+        data?: {
+          error?: string;
+          message?: string;
+          errors?: Array<{ msg?: string; message?: string }>;
+        };
+      };
+      code?: string;
+      message?: string;
+    };
+
+    const data = axiosError.response?.data;
+    if (data?.errors?.length) {
+      return data.errors.map((e) => e.msg || e.message).filter(Boolean).join('. ');
+    }
+    if (data?.error) return data.error;
+    if (data?.message) return data.message;
+
+    if (axiosError.response?.status === 500) {
+      return 'Server error. Make sure the UrbanFlow backend services are running.';
+    }
   }
+
+  if (typeof error === 'object' && error !== null) {
+    const axiosError = error as { code?: string; message?: string; response?: unknown };
+    if (!axiosError.response) {
+      if (axiosError.code === 'ERR_NETWORK' || axiosError.message === 'Network Error') {
+        return 'Cannot reach the server. Start the backend with ./scripts/dev-local.sh or ./scripts/setup-local.sh';
+      }
+    }
+  }
+
   if (error instanceof Error) {
     return error.message;
   }

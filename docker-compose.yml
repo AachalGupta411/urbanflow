@@ -11,6 +11,7 @@ x-service-env: &service-env
   KAFKA_BROKERS: kafka:9092
   JWT_SECRET: urbanflow-dev-secret-change-in-prod
   LOG_LEVEL: info
+  RATE_LIMIT_MAX: "1000"
 
 services:
   # ── Infrastructure ──────────────────────────────────────────────
@@ -234,9 +235,47 @@ services:
     networks:
       - urbanflow
 
-  # ── Monitoring (optional: docker compose --profile observability up) ──
+  # ── Monitoring ──────────────────────────────────────────────────────
+  metrics-mock:
+    build:
+      context: ./monitoring/mock-metrics
+    container_name: urbanflow-metrics-mock
+    environment:
+      PORT: 3010
+      TICK_MS: 2000
+    ports:
+      - "3010:3010"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3010/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - urbanflow
+
+  gps-mock:
+    build:
+      context: ./monitoring/gps-mock
+    container_name: urbanflow-gps-mock
+    environment:
+      GPS_URL: http://gps-service:3003
+      GPS_API_KEY: urbanflow-gps-dev-key
+      TICK_MS: 5000
+      PORT: 3011
+    ports:
+      - "3011:3011"
+    depends_on:
+      gps-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3011/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - urbanflow
+
   prometheus:
-    profiles: [observability]
     image: prom/prometheus:v2.51.0
     container_name: urbanflow-prometheus
     volumes:
@@ -249,11 +288,16 @@ services:
       - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - urbanflow
 
   grafana:
-    profiles: [observability]
     image: grafana/grafana:10.4.0
     container_name: urbanflow-grafana
     environment:
@@ -267,7 +311,14 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - urbanflow
 

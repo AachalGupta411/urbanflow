@@ -1,8 +1,8 @@
 'use strict';
 
-const config = require('@urbanflow/shared/config');
-const { getPool } = require('@urbanflow/shared/utils/db');
-const logger = require('@urbanflow/shared/utils/logger');
+const config = require('../../shared/config');
+const { getPool } = require('../../shared/utils/db');
+const logger = require('../../shared/utils/logger');
 const { createApp } = require('./app');
 const { startConsumer } = require('./consumers/kafkaConsumer');
 

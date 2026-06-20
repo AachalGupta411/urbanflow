@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import FadeIn from './FadeIn';
+import OptimizedImage from './OptimizedImage';
 
 const routes = [
   {
@@ -56,11 +57,10 @@ export default function PopularRoutes() {
             <FadeIn key={`${route.from}-${route.to}`} delay={i * 0.08}>
               <article className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src={route.image}
                     alt={route.alt}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
                   <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800 backdrop-blur">

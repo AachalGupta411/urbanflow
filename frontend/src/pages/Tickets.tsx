@@ -1,8 +1,16 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { Bus, RefreshCw, Ticket, TrainFront, Zap } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import TicketCard from '@/components/TicketCard';
+import { MetricCard } from '@/components/dashboard';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn, formatCurrency } from '@/lib/utils';
 import * as ticketingApi from '@/services/ticketingApi';
-import type { CreateTicketPayload, Ticket, VehicleType } from '@/types';
+import type { CreateTicketPayload, Ticket as TicketType, VehicleType } from '@/types';
 import { getErrorMessage } from '@/utils/token';
 
 const demoRoutes = [
@@ -11,11 +19,19 @@ const demoRoutes = [
   { id: 'R-303', origin: 'North Park', destination: 'EV Depot', fare: 3.25 },
 ];
 
-const vehicleTypes: VehicleType[] = ['bus', 'metro', 'ev'];
+const vehicleTypes: { value: VehicleType; label: string; icon: typeof Bus }[] = [
+  { value: 'bus', label: 'Bus', icon: Bus },
+  { value: 'metro', label: 'Metro', icon: TrainFront },
+  { value: 'ev', label: 'EV', icon: Zap },
+];
+
+const selectClassName =
+  'flex h-11 w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 focus-visible:border-teal-500';
 
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<TicketType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
   const [error, setError] = useState('');
@@ -30,8 +46,9 @@ export default function TicketsPage() {
     travel_date: new Date().toISOString().slice(0, 10),
   });
 
-  const loadTickets = async () => {
-    setLoading(true);
+  const loadTickets = async (silent = false) => {
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
     setError('');
     try {
       const data = await ticketingApi.listTickets();
@@ -40,12 +57,24 @@ export default function TicketsPage() {
       setError(getErrorMessage(err, 'Failed to load tickets'));
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     void loadTickets();
   }, []);
+
+  const stats = useMemo(() => {
+    const active = tickets.filter((t) => t.status === 'active').length;
+    const cancelled = tickets.filter((t) => t.status === 'cancelled').length;
+    const spent = tickets
+      .filter((t) => t.status !== 'cancelled')
+      .reduce((sum, t) => sum + Number(t.fare), 0);
+    return { total: tickets.length, active, cancelled, spent };
+  }, [tickets]);
+
+  const selectedRoute = demoRoutes.find((r) => r.id === form.route_id) ?? demoRoutes[0];
 
   const handleRouteChange = (routeId: string) => {
     const route = demoRoutes.find((r) => r.id === routeId);
@@ -67,7 +96,7 @@ export default function TicketsPage() {
     try {
       const ticket = await ticketingApi.createTicket(form);
       setTickets((prev) => [ticket, ...prev]);
-      setSuccess(`Ticket booked! Code: ${ticket.ticket_code}`);
+      setSuccess(`Ticket booked successfully! Your code is ${ticket.ticket_code}.`);
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to create ticket'));
     } finally {
@@ -91,124 +120,218 @@ export default function TicketsPage() {
   };
 
   return (
-    <div className="page">
-      <header className="page-header">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1>Tickets</h1>
-          <p className="text-muted">Book, view, and cancel transit tickets across bus, metro, and EV routes.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Ticketing</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Book, view, and cancel transit tickets across bus, metro, and EV routes.
+          </p>
         </div>
-      </header>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => void loadTickets(true)}
+          disabled={refreshing}
+        >
+          <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
+          Refresh
+        </Button>
+      </div>
 
-      {error ? <div className="alert alert-error">{error}</div> : null}
-      {success ? <div className="alert alert-success">{success}</div> : null}
+      {error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      ) : null}
 
-      <div className="split-layout">
-        <section className="panel">
-          <h2>Book a ticket</h2>
-          <form className="form-stack" onSubmit={handleSubmit}>
-            <label>
-              Route
-              <select
-                value={form.route_id}
-                onChange={(e) => handleRouteChange(e.target.value)}
-              >
-                {demoRoutes.map((route) => (
-                  <option key={route.id} value={route.id}>
-                    {route.id}: {route.origin} → {route.destination}
-                  </option>
+      {success ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {success}
+        </div>
+      ) : null}
+
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          title="Total bookings"
+          value={stats.total}
+          changeLabel={`${stats.active} active`}
+          icon={Ticket}
+          accent="blue"
+          loading={loading}
+        />
+        <MetricCard
+          title="Active tickets"
+          value={stats.active}
+          changeLabel="Ready to travel"
+          icon={Bus}
+          accent="green"
+          loading={loading}
+        />
+        <MetricCard
+          title="Cancelled"
+          value={stats.cancelled}
+          changeLabel="Refunded or voided"
+          icon={Ticket}
+          accent="amber"
+          loading={loading}
+        />
+        <MetricCard
+          title="Total spent"
+          value={formatCurrency(stats.spent)}
+          changeLabel="Excluding cancelled"
+          icon={Zap}
+          accent="cyan"
+          loading={loading}
+        />
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <Card className="xl:col-span-5">
+          <CardHeader>
+            <CardTitle>Book a ticket</CardTitle>
+            <CardDescription>
+              Select a route and travel details — fare is calculated automatically.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-5 rounded-xl border border-teal-100 bg-gradient-to-br from-teal-50 to-blue-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-teal-700">Selected route</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">{selectedRoute.id}</p>
+              <p className="mt-0.5 text-sm text-slate-600">
+                {selectedRoute.origin} → {selectedRoute.destination}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-emerald-600">
+                From {formatCurrency(selectedRoute.fare)}
+              </p>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="ticket-route">Route</Label>
+                <select
+                  id="ticket-route"
+                  className={selectClassName}
+                  value={form.route_id}
+                  onChange={(e) => handleRouteChange(e.target.value)}
+                >
+                  {demoRoutes.map((route) => (
+                    <option key={route.id} value={route.id}>
+                      {route.id}: {route.origin} → {route.destination}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ticket-vehicle">Vehicle type</Label>
+                <select
+                  id="ticket-vehicle"
+                  className={selectClassName}
+                  value={form.vehicle_type}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, vehicle_type: e.target.value as VehicleType }))
+                  }
+                >
+                  {vehicleTypes.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="ticket-origin">Origin</Label>
+                  <Input
+                    id="ticket-origin"
+                    type="text"
+                    value={form.origin}
+                    onChange={(e) => setForm((prev) => ({ ...prev, origin: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ticket-destination">Destination</Label>
+                  <Input
+                    id="ticket-destination"
+                    type="text"
+                    value={form.destination}
+                    onChange={(e) => setForm((prev) => ({ ...prev, destination: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="ticket-fare">Fare (USD)</Label>
+                  <Input
+                    id="ticket-fare"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={form.fare}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, fare: parseFloat(e.target.value) || 0 }))
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ticket-date">Travel date</Label>
+                  <Input
+                    id="ticket-date"
+                    type="date"
+                    value={form.travel_date}
+                    onChange={(e) => setForm((prev) => ({ ...prev, travel_date: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button type="submit" variant="teal" className="w-full" disabled={submitting}>
+                {submitting ? 'Booking…' : 'Book ticket'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="xl:col-span-7">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Your bookings</CardTitle>
+              <CardDescription>Tickets linked to your passenger account</CardDescription>
+            </div>
+            <Badge variant="muted">{tickets.length} total</Badge>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <LoadingSpinner label="Loading tickets..." size="sm" />
+            ) : tickets.length === 0 ? (
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
+                <Ticket className="mb-3 h-10 w-10 text-slate-300" />
+                <p className="text-sm font-medium text-slate-700">No bookings yet</p>
+                <p className="mt-1 max-w-sm text-sm text-slate-500">
+                  Use the form on the left to book your first ride on any UrbanFlow route.
+                </p>
+              </div>
+            ) : (
+              <div className="grid max-h-[620px] gap-4 overflow-y-auto pr-1 sm:grid-cols-2">
+                {tickets.map((ticket) => (
+                  <TicketCard
+                    key={ticket.id}
+                    ticket={ticket}
+                    onCancel={handleCancel}
+                    cancelling={cancellingId === ticket.id}
+                  />
                 ))}
-              </select>
-            </label>
-
-            <label>
-              Vehicle type
-              <select
-                value={form.vehicle_type}
-                onChange={(e) => setForm((prev) => ({ ...prev, vehicle_type: e.target.value as VehicleType }))}
-              >
-                {vehicleTypes.map((type) => (
-                  <option key={type} value={type}>{type.toUpperCase()}</option>
-                ))}
-              </select>
-            </label>
-
-            <div className="form-row">
-              <label>
-                Origin
-                <input
-                  type="text"
-                  value={form.origin}
-                  onChange={(e) => setForm((prev) => ({ ...prev, origin: e.target.value }))}
-                  required
-                />
-              </label>
-              <label>
-                Destination
-                <input
-                  type="text"
-                  value={form.destination}
-                  onChange={(e) => setForm((prev) => ({ ...prev, destination: e.target.value }))}
-                  required
-                />
-              </label>
-            </div>
-
-            <div className="form-row">
-              <label>
-                Fare (USD)
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={form.fare}
-                  onChange={(e) => setForm((prev) => ({ ...prev, fare: parseFloat(e.target.value) }))}
-                  required
-                />
-              </label>
-              <label>
-                Travel date
-                <input
-                  type="date"
-                  value={form.travel_date}
-                  onChange={(e) => setForm((prev) => ({ ...prev, travel_date: e.target.value }))}
-                  required
-                />
-              </label>
-            </div>
-
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting ? 'Booking...' : 'Book ticket'}
-            </button>
-          </form>
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <h2>Your bookings</h2>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => void loadTickets()}>
-              Refresh
-            </button>
-          </div>
-
-          {loading ? (
-            <LoadingSpinner label="Loading tickets..." size="sm" />
-          ) : tickets.length === 0 ? (
-            <div className="empty-state">
-              <p>No bookings found. Create your first ticket to get started.</p>
-            </div>
-          ) : (
-            <div className="ticket-grid">
-              {tickets.map((ticket) => (
-                <TicketCard
-                  key={ticket.id}
-                  ticket={ticket}
-                  onCancel={handleCancel}
-                  cancelling={cancellingId === ticket.id}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

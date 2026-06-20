@@ -52,7 +52,8 @@ export interface OperationsDashboardData {
 
 function mapFleetStatus(speed: number, status?: string): FleetVehicle['status'] {
   if (status === 'maintenance') return 'maintenance';
-  if (speed === 0) return 'delayed';
+  if (status === 'delayed') return 'delayed';
+  if (speed === 0) return 'idle';
   if (speed < 5) return 'idle';
   return 'active';
 }

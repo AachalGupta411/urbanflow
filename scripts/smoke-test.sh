@@ -9,6 +9,10 @@ NOTIFICATION_URL="${NOTIFICATION_URL:-http://localhost:3004}"
 ANALYTICS_URL="${ANALYTICS_URL:-http://localhost:3005}"
 FRONTEND_URL="${FRONTEND_URL:-http://localhost:8080}"
 
+PROMETHEUS_URL="${PROMETHEUS_URL:-http://localhost:9090}"
+GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
+METRICS_MOCK_URL="${METRICS_MOCK_URL:-http://localhost:3010}"
+
 check_health() {
   local name="$1" url="$2"
   echo -n "Checking $name... "
@@ -27,6 +31,30 @@ check_health "Ticketing Service" "$TICKETING_URL"
 check_health "GPS Service" "$GPS_URL"
 check_health "Notification Service" "$NOTIFICATION_URL"
 check_health "Analytics Service" "$ANALYTICS_URL"
+
+echo -n "Checking Prometheus... "
+if curl -sf "$PROMETHEUS_URL/-/healthy" > /dev/null; then
+  echo "OK"
+else
+  echo "FAILED"
+  exit 1
+fi
+
+echo -n "Checking Grafana... "
+if curl -sf "$GRAFANA_URL/api/health" > /dev/null; then
+  echo "OK"
+else
+  echo "FAILED"
+  exit 1
+fi
+
+echo -n "Checking Mock Metrics... "
+if curl -sf "$METRICS_MOCK_URL/health" > /dev/null; then
+  echo "OK"
+else
+  echo "FAILED"
+  exit 1
+fi
 
 echo -n "Checking Frontend... "
 if curl -sf "$FRONTEND_URL" > /dev/null; then

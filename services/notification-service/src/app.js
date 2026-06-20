@@ -3,11 +3,11 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimiter = require('@urbanflow/shared/middleware/rateLimiter');
-const { metricsMiddleware, metricsHandler } = require('@urbanflow/shared/middleware/metrics');
-const { healthCheck: dbHealthCheck } = require('@urbanflow/shared/utils/db');
-const { healthCheck: redisHealthCheck } = require('@urbanflow/shared/utils/redis');
-const logger = require('@urbanflow/shared/utils/logger');
+const rateLimiter = require('../../shared/middleware/rateLimiter');
+const { metricsMiddleware, metricsHandler } = require('../../shared/middleware/metrics');
+const { healthCheck: dbHealthCheck } = require('../../shared/utils/db');
+const { healthCheck: redisHealthCheck } = require('../../shared/utils/redis');
+const logger = require('../../shared/utils/logger');
 const notificationRoutes = require('./routes/notifications');
 
 function createApp() {

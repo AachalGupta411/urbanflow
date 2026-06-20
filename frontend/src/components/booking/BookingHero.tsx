@@ -4,6 +4,7 @@ import { ArrowRightLeft, Calendar, MapPin, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import OptimizedImage from './OptimizedImage';
 
 type TripType = 'oneway' | 'roundtrip';
 
@@ -55,7 +56,7 @@ export default function BookingHero() {
             className="relative hidden lg:block"
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl shadow-slate-300/50">
-              <img
+              <OptimizedImage
                 src={HERO_IMAGE}
                 alt="Modern intercity bus on a scenic highway"
                 className="h-full w-full object-cover"
@@ -72,7 +73,7 @@ export default function BookingHero() {
 
         {/* Mobile hero image */}
         <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-2xl shadow-lg lg:hidden">
-          <img
+          <OptimizedImage
             src={HERO_IMAGE}
             alt="Modern intercity bus on a scenic highway"
             className="h-full w-full object-cover"

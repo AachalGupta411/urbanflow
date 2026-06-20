@@ -31,7 +31,14 @@ interface TicketStatsProps {
 
 const COLORS = ['#3b82f6', '#06b6d4', '#10b981'];
 
+function yAxisMax(data: TicketStatRow[]): number {
+  const peak = Math.max(...data.map((row) => row.created), 0);
+  return Math.max(5, Math.ceil(peak * 1.4));
+}
+
 export default function TicketStats({ data, summary, loading }: TicketStatsProps) {
+  const chartMax = yAxisMax(data);
+
   return (
     <Card>
       <CardHeader>
@@ -57,15 +64,29 @@ export default function TicketStats({ data, summary, loading }: TicketStatsProps
         )}
 
         {loading ? (
-          <div className="h-[200px] animate-pulse rounded-lg bg-slate-100" />
+          <div className="h-[220px] animate-pulse rounded-lg bg-slate-100" />
+        ) : data.length === 0 ? (
+          <div className="flex h-[220px] items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
+            Ticket breakdown by vehicle type will appear after bookings are recorded.
+          </div>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart
+              data={data}
+              barCategoryGap="35%"
+              margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
               <XAxis dataKey="label" tick={{ fill: AXIS_TICK, fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: AXIS_TICK, fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis
+                tick={{ fill: AXIS_TICK, fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+                domain={[0, chartMax]}
+              />
               <Tooltip contentStyle={CHART_TOOLTIP} />
-              <Bar dataKey="created" name="Created" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="created" name="Created" radius={[6, 6, 0, 0]} maxBarSize={56}>
                 {data.map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}

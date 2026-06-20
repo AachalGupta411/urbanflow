@@ -1,8 +1,8 @@
 'use strict';
 
-const { createConsumer } = require('@urbanflow/shared/utils/kafka');
-const { getRedis } = require('@urbanflow/shared/utils/redis');
-const logger = require('@urbanflow/shared/utils/logger');
+const { createConsumer } = require('../../../shared/utils/kafka');
+const { getRedis } = require('../../../shared/utils/redis');
+const logger = require('../../../shared/utils/logger');
 const notificationService = require('../services/notificationService');
 const { TOPICS, CONSUMER_GROUP, DEDUP_PREFIX, DEDUP_TTL_SECONDS } = require('../constants');
 

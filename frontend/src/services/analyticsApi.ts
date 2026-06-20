@@ -1,17 +1,21 @@
 import { analyticsClient } from './api';
-import type { AnalyticsPassengers, AnalyticsRoutes, AnalyticsTickets } from '@/types';
+import type {
+  PassengerAnalyticsResponse,
+  RouteAnalyticsResponse,
+  TicketAnalyticsResponse,
+} from '@/utils/analyticsTransform';
 
-export async function getPassengerAnalytics(): Promise<AnalyticsPassengers> {
-  const { data } = await analyticsClient.get<AnalyticsPassengers>('/api/analytics/passengers');
+export async function getPassengerAnalytics(): Promise<PassengerAnalyticsResponse> {
+  const { data } = await analyticsClient.get<PassengerAnalyticsResponse>('/api/analytics/passengers');
   return data;
 }
 
-export async function getTicketAnalytics(): Promise<AnalyticsTickets> {
-  const { data } = await analyticsClient.get<AnalyticsTickets>('/api/analytics/tickets');
+export async function getTicketAnalytics(): Promise<TicketAnalyticsResponse> {
+  const { data } = await analyticsClient.get<TicketAnalyticsResponse>('/api/analytics/tickets');
   return data;
 }
 
-export async function getRouteAnalytics(): Promise<AnalyticsRoutes> {
-  const { data } = await analyticsClient.get<AnalyticsRoutes>('/api/analytics/routes');
+export async function getRouteAnalytics(): Promise<RouteAnalyticsResponse> {
+  const { data } = await analyticsClient.get<RouteAnalyticsResponse>('/api/analytics/routes');
   return data;
 }

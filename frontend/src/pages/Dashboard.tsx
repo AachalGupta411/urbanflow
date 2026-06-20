@@ -6,14 +6,14 @@ import TicketCard from '@/components/TicketCard';
 import { useAuth } from '@/hooks/useAuth';
 import * as analyticsApi from '@/services/analyticsApi';
 import * as ticketingApi from '@/services/ticketingApi';
-import type { AnalyticsPassengers, AnalyticsTickets, Ticket } from '@/types';
+import type { Ticket } from '@/types';
+import { buildAnalyticsView } from '@/utils/analyticsTransform';
 import { formatCurrency, getErrorMessage } from '@/utils/token';
 
 export default function DashboardPage() {
   const { passenger } = useAuth();
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [passengerStats, setPassengerStats] = useState<AnalyticsPassengers | null>(null);
-  const [ticketStats, setTicketStats] = useState<AnalyticsTickets | null>(null);
+  const [analyticsView, setAnalyticsView] = useState<ReturnType<typeof buildAnalyticsView> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -28,8 +28,7 @@ export default function DashboardPage() {
           analyticsApi.getTicketAnalytics().catch(() => null),
         ]);
         setTickets(ticketList);
-        setPassengerStats(pStats);
-        setTicketStats(tStats);
+        setAnalyticsView(buildAnalyticsView(pStats, tStats, null));
       } catch (err) {
         setError(getErrorMessage(err, 'Failed to load dashboard'));
       } finally {
@@ -68,14 +67,24 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Platform passengers"
-          value={passengerStats?.total_passengers ?? '—'}
-          hint={passengerStats ? `${passengerStats.new_today} joined today` : 'Analytics service offline'}
+          value={analyticsView?.passengerSummary.total_registered ?? '—'}
+          hint={
+            analyticsView
+              ? `${analyticsView.newToday} joined today`
+              : 'Analytics service offline'
+          }
           accent="purple"
         />
         <StatCard
           label="Platform revenue"
-          value={ticketStats ? formatCurrency(ticketStats.revenue_total) : '—'}
-          hint={ticketStats ? `${ticketStats.tickets_today} tickets today` : 'Analytics service offline'}
+          value={
+            analyticsView ? formatCurrency(analyticsView.ticketSummary.total_revenue) : '—'
+          }
+          hint={
+            analyticsView
+              ? `${analyticsView.ticketsToday} tickets today`
+              : 'Analytics service offline'
+          }
           accent="amber"
         />
       </section>

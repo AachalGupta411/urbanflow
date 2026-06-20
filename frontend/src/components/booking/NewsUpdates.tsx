@@ -1,5 +1,6 @@
 import { Calendar, ChevronRight } from 'lucide-react';
 import FadeIn from './FadeIn';
+import OptimizedImage from './OptimizedImage';
 
 const news = [
   {
@@ -45,11 +46,10 @@ export default function NewsUpdates() {
             <FadeIn key={item.title} delay={i * 0.08}>
               <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="aspect-[16/10] overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src={item.image}
                     alt={item.alt}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    loading="lazy"
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-5">
